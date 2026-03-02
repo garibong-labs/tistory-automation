@@ -65,6 +65,17 @@ blog-drafts/
 - **배너**: 파일 다이얼로그를 코드로 제어할 수 없어서 Playwright `upload` 액션으로 우회
 - **대표이미지**: 설정 다이얼로그의 셀렉터가 10가지 이상 변형 — 전부 탐색하는 v2 로직
 
+## 설치
+
+### ClawHub (추천)
+```bash
+openclaw skill install tistory-publish
+```
+
+### GitHub에서 직접
+```bash
+openclaw skill install garibong-labs/tistory-automation
+```
 ## 사용 방법
 
 ### 전제 조건
