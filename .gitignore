@@ -1,0 +1,16 @@
+# Credentials
+.credentials/
+secrets/
+
+# Daily drafts (generated content)
+blog-drafts/mk-review-*.md
+
+# Anthropic blog drafts (legacy)
+blog-drafts/anthropic-*.html
+blog-drafts/anthropic-*.md
+
+# OS
+.DS_Store
+
+# Node
+node_modules/
