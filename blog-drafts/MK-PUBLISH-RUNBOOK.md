@@ -8,7 +8,7 @@
 
 ## 사전 조건
 - 티스토리 로그인 완료 (Kakao 계정)
-  - 로그인이 풀렸을 경우: `~/.openclaw/workspace-ruth/.credentials/tistory-kakao.enc` 파일 참조
+  - 로그인이 풀렸을 경우: 암호화된 credential 파일 참조 (경로는 내부 관리)
 - `profile="openclaw"` 브라우저 사용
 
 ---
