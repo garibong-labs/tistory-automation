@@ -100,4 +100,4 @@ MIT
 
 ## 만든 곳
 
-[가리봉랩스](https://github.com/garibong-labs) — 1인 + 에이전트 셋
+[가리봉랩스](https://github.com/garibong-labs) — Solo developer with three AI agents
