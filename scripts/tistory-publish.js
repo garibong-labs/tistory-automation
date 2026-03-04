@@ -22,6 +22,38 @@
  */
 
 // ============================================================
+// 0. 로그인 상태 확인
+// ============================================================
+
+/**
+ * 티스토리 로그인 상태 확인
+ * @returns {{ loggedIn: boolean, url: string, reason: string }}
+ */
+function checkLoginStatus() {
+  const url = window.location.href;
+
+  // 카카오 로그인 페이지로 리다이렉트된 경우
+  if (url.includes('accounts.kakao.com') || url.includes('logins.daum.net')) {
+    return { loggedIn: false, url, reason: 'redirected_to_login' };
+  }
+
+  // 티스토리 관리자 페이지가 아닌 경우
+  if (!url.includes('tistory.com/manage')) {
+    return { loggedIn: false, url, reason: 'not_manage_page' };
+  }
+
+  // 에디터 영역 존재 확인 (newpost 페이지)
+  if (url.includes('/manage/newpost')) {
+    const editor = document.querySelector('.mce-tinymce, #tinymce, .CodeMirror');
+    if (!editor) {
+      return { loggedIn: false, url, reason: 'editor_not_found' };
+    }
+  }
+
+  return { loggedIn: true, url, reason: 'ok' };
+}
+
+// ============================================================
 // 1. HTML 생성 헬퍼
 // ============================================================
 

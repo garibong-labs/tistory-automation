@@ -67,11 +67,28 @@ node ~/.openclaw/workspace-ruth/scripts/mk-banner.js
 
 ---
 
-## 1단계: 새 글 페이지 열기
+## 1단계: 새 글 페이지 열기 + 로그인 확인
 
 ```
 browser navigate → https://bongman.tistory.com/manage/newpost
 ```
+
+### 1-1. 로그인 상태 확인 (필수)
+
+```javascript
+// browser evaluate (tistory-publish.js 로드 후):
+checkLoginStatus()
+// 기대값: { loggedIn: true, reason: 'ok' }
+```
+
+**loggedIn=false인 경우:**
+1. `reason: 'redirected_to_login'` → 카카오 로그인 세션 만료. credential 파일 참조하여 재로그인 실행.
+2. `reason: 'not_manage_page'` → URL 확인 후 다시 navigate.
+3. `reason: 'editor_not_found'` → 페이지 로딩 대기 (5초) 후 재확인. 2회 실패 시 재로그인.
+
+**재로그인 후 반드시** `https://bongman.tistory.com/manage/newpost`로 다시 navigate하고 `checkLoginStatus()` 재확인.
+
+> ⚠️ **로그인 확인 없이 2단계로 넘어가지 말 것.** 세션 만료 시 이후 모든 단계가 조용히 실패함.
 
 ---
 
