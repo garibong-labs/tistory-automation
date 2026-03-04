@@ -159,24 +159,46 @@ cleanupOGResiduals()
 
 ---
 
-## 5단계: 배너 업로드 (Playwright upload 방식)
+## 5단계: 배너 업로드 (Canvas → Drop 이벤트 방식)
 
-> v3: base64 청크 주입 폐지 → Playwright `upload` 액션으로 직접 파일 업로드.
-> Tistory가 자동으로 서버(daumcdn.net)에 올려줌.
+> v4: Playwright upload 폐지 → Canvas Drop 이벤트로 TinyMCE에 직접 주입.
+> file input 의존 제거. Tistory가 자동으로 서버(daumcdn.net)에 업로드 처리.
 
-### 5-1. 업로드 입력 활성화
+> ⚠️ **절대 금지: `base64 ... | tr -d '\n'` 결과를 exec 출력으로 읽지 말 것!**
+> 배너 이미지 base64는 ~200KB → 컨텍스트에 그대로 들어가면 토큰 한도(200K) 초과로 세션 즉사.
+> 반드시 아래 청크 방식만 사용할 것.
+
+### 5-1. 배너 파일을 base64 청크로 분할
+```bash
+# 25KB 단위로 분할 — 절대 전체를 한 번에 읽지 말 것
+base64 -i /tmp/mk-banner-YYYY-MM-DD.jpg | split -b 25000 /tmp/mk-b64-
+ls /tmp/mk-b64-* | wc -l  # 청크 개수 확인 (보통 8~9개)
+```
+
+### 5-2. 청크를 window 변수에 주입
 ```javascript
-// evaluate: 첨부 → 사진 메뉴 클릭 → input#openFile 활성화
-await openBannerUploadInput()
-// 반환: { success: true, note: 'Photo menu clicked...' }
+// browser evaluate — 초기화
+window._bannerB64 = '';
 ```
 
-### 5-2. Playwright로 파일 업로드
+각 청크 파일을 읽어서 window 변수에 이어붙이기:
+```bash
+cat /tmp/mk-b64-aa  # → 결과를 아래 evaluate에 붙여넣기
 ```
-browser(action="upload", profile="openclaw", selector="#openFile", paths=["/tmp/mk-banner-YYYY-MM-DD.jpg"])
+```javascript
+// browser evaluate — 청크마다 반복
+window._bannerB64 += '<chunk_content>';
+```
+모든 청크 주입 완료 후:
+
+### 5-3. Drop 이벤트로 업로드
+```javascript
+// browser evaluate (tistory-publish.js 로드 후):
+await uploadBannerViaDrop({ base64: window._bannerB64 })
+// 반환: { success: true, method: 'canvasDrop', src: 'https://img1.daumcdn.net/...' }
 ```
 
-### 5-3. 업로드 확인 (3초 대기 후)
+### 5-4. 업로드 확인 (자동 — 함수 내 3초 대기 포함)
 ```javascript
 // evaluate: 서버 업로드 확인
 verifyBannerUpload()
@@ -184,7 +206,7 @@ verifyBannerUpload()
 // 실패: { success: false, isBlob: true } 또는 { isData: true }
 ```
 
-### 5-4. 실패 시
+### 5-5. 실패 시
 배너 업로드 실패 → **건너뛰지 말 것**. 실패 사유를 기록해두고 6단계로 진행.
 발행 전 체크리스트(8단계 직전)에서 누락 항목으로 집계됨.
 
@@ -220,7 +242,7 @@ setTags(["매경", "매일경제", "신문리뷰", "태그4", "태그5", "태그
 ```
 필수 항목 (이 중 하나라도 실패 → 비공개 발행 + Eli 검수 요청):
   [ ] OG 카드 4개 렌더링 확인 (cleanupOGResiduals() 결과 ogCards === 4)
-  [ ] 배너 이미지 에디터에 존재 (uploadBannerFromWindow() success === true)
+  [ ] 배너 이미지 에디터에 존재 (uploadBannerViaDrop() success === true)
 
 권장 항목 (누락 시 Eli에게 알리되 발행은 진행 가능):
   [ ] 대표이미지 설정됨
