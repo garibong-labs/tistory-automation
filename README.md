@@ -1,3 +1,16 @@
+# ⚠️ Deprecated / Archived
+
+This repository is no longer used in production.
+
+Current Tistory publishing module:
+- https://github.com/garibong-labs/openclaw-skills/tree/main/tistory-publish
+
+Current Daum Trends pipeline:
+- https://github.com/garibong-labs/daum-trends-pipeline
+
+This repository is kept only as historical reference.
+Do not use it for new automation work.
+
 # tistory-automation
 
 티스토리 블로그 자동 발행 도구. AI 에이전트(OpenClaw)가 매일 아침 매경 리뷰를 작성하고 발행합니다.
